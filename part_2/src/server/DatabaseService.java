@@ -10,7 +10,7 @@ public class DatabaseService {
     private static final String DB_HOST = "localhost";
     private static final String DB_USER = "c3358";
     private static final String DB_PASS = "c3358PASS";
-    private static final String DB_NAME = "c3358";
+    private static final String DB_NAME = "c3358_assg";
 
     private final Connection conn;
 
@@ -32,7 +32,7 @@ public class DatabaseService {
 
     public UserInfoEntry readUser(String username) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
-                "SELECT username, password, num_games, num_wins, avg_time_to_win, rank" +
+                "SELECT username, password, num_games, num_wins, avg_time_to_win, leaderboard_rank" +
                 " FROM users WHERE username = ?");
         stmt.setString(1, username);
         ResultSet rs = stmt.executeQuery();
@@ -43,7 +43,7 @@ public class DatabaseService {
                     rs.getInt("num_games"),
                     rs.getInt("num_wins"),
                     rs.getFloat("avg_time_to_win"),
-                    rs.getInt("rank"));
+                    rs.getInt("leaderboard_rank"));
         }
         return null;
     }
@@ -56,14 +56,14 @@ public class DatabaseService {
         stmt.executeUpdate();
     }
 
-    public void updateUserStats(String username, int numGames, int numWins, float avgTimeToWin, int rank) throws SQLException {
+    public void updateUserStats(String username, int numGames, int numWins, float avgTimeToWin, int leaderboard_rank) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE users SET num_games = ?, num_wins = ?, avg_time_to_win = ?, rank = ?" +
+                "UPDATE users SET num_games = ?, num_wins = ?, avg_time_to_win = ?, leaderboard_rank = ?" +
                 " WHERE username = ?");
         stmt.setInt(1, numGames);
         stmt.setInt(2, numWins);
         stmt.setFloat(3, avgTimeToWin);
-        stmt.setInt(4, rank);
+        stmt.setInt(4, leaderboard_rank);
         stmt.setString(5, username);
         stmt.executeUpdate();
     }
