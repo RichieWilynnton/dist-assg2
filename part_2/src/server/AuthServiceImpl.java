@@ -29,7 +29,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
                 return new LoginResponse(false, "Incorrect password");
             }
 
-            if (db.readOnlineUser(loginRequest.username)) {
+            if (db.isOnlineUser(loginRequest.username)) {
                 return new LoginResponse(false, "User already logged in");
             }
 
@@ -38,7 +38,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
             return new LoginResponse(true, "Login successful");
         } catch (SQLException e) {
             System.err.println("Database error during login: " + e.getMessage());
-            return new LoginResponse(false, "Internal server error");
+            return new LoginResponse(false, "Internal server error " + e.getMessage());
         }
     }
 
@@ -49,12 +49,12 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
                 return new RegisterResponse(false, "Username already exists");
             }
 
-            db.insertUser(registerRequest.username, registerRequest.password);
+            db.insertNewUser(registerRequest.username, registerRequest.password);
             System.out.println("New user registered: " + registerRequest.username);
             return new RegisterResponse(true, "Registration successful");
         } catch (SQLException e) {
             System.err.println("Database error during registration: " + e.getMessage());
-            return new RegisterResponse(false, "Internal server error");
+            return new RegisterResponse(false, "Internal server error : " + e.getMessage());
         }
     }
 
@@ -66,7 +66,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
             return new LogoutResponse(true, "Logout successful");
         } catch (SQLException e) {
             System.err.println("Database error during logout: " + e.getMessage());
-            return new LogoutResponse(false, "Internal server error");
+            return new LogoutResponse(false, "Internal server error : " + e.getMessage());
         }
     }
 }

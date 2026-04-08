@@ -1,5 +1,7 @@
 package client;
 
+import dto.GetProfileRequest;
+import dto.GetProfileResponse;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -13,6 +15,31 @@ public class UserProfilePanel extends JPanel {
     }
 
     private void buildUi() {
+        String username = ClientSession.username;
+        int numWins = 0, numGames = 0, rank = 0;
+        float avgTimeToWin = 0.0f;
+
+        boolean fetchFailed = false;
+
+        try {
+            GetProfileResponse resp = ClientApp.userService.getProfile(new GetProfileRequest(username));
+            if (resp.success) {
+                numWins = resp.numWins;
+                numGames = resp.numGames;
+                avgTimeToWin = resp.avgTimeToWin;
+                rank = resp.rank;
+            } else {
+                fetchFailed = true;
+            }
+        } catch (Exception e) {
+            fetchFailed = true;
+        }
+
+        if (fetchFailed) {
+            add(new JLabel("Failed to fetch profile."));
+            return;
+        }
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.anchor = GridBagConstraints.LINE_START;
@@ -22,34 +49,34 @@ public class UserProfilePanel extends JPanel {
         add(new JLabel("Name:"), gbc);
 
         gbc.gridx = 1;
-        add(new JLabel(ClientSession.instance.username), gbc);
+        add(new JLabel(username), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(new JLabel("Number of Wins:"), gbc);
 
         gbc.gridx = 1;
-        add(new JLabel(String.valueOf(ClientSession.instance.numWins)), gbc);
+        add(new JLabel(String.valueOf(numWins)), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
         add(new JLabel("Number of Games:"), gbc);
 
         gbc.gridx = 1;
-        add(new JLabel(String.valueOf(ClientSession.instance.numGames)), gbc);
+        add(new JLabel(String.valueOf(numGames)), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
         add(new JLabel("Average Time to Win:"), gbc);
 
         gbc.gridx = 1;
-        add(new JLabel(String.valueOf(ClientSession.instance.avgTimeToWin)), gbc);
+        add(new JLabel(String.valueOf(avgTimeToWin)), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 4;
         add(new JLabel("Rank:"), gbc);
 
         gbc.gridx = 1;
-        add(new JLabel(String.valueOf(ClientSession.instance.rank)), gbc);
+        add(new JLabel(String.valueOf(rank)), gbc);
     }
 }

@@ -1,5 +1,7 @@
 package client;
 
+import dto.LogGameRequest;
+import dto.LogGameResponse;
 import dto.LogoutRequest;
 import dto.LogoutResponse;
 import java.awt.BorderLayout;
@@ -8,6 +10,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import server.AuthService;
 
@@ -34,7 +37,6 @@ public class DashboardFrame extends JFrame {
         setLayout(new BorderLayout());
 
         contentPanel.add(new UserProfilePanel(), PROFILE_CARD);
-        contentPanel.add(new LeaderboardPanel(), LEADERBOARD_CARD);
         add(contentPanel, BorderLayout.CENTER);
 
         setJMenuBar(buildMenuBar());
@@ -80,23 +82,39 @@ public class DashboardFrame extends JFrame {
 
     private void handleAction(String actionCommand) {
         if ("profile".equals(actionCommand)) {
+            contentPanel.removeAll();
+            contentPanel.add(new UserProfilePanel(), PROFILE_CARD);
             cardLayout.show(contentPanel, PROFILE_CARD);
+            contentPanel.revalidate();
+            contentPanel.repaint();
             return;
         }
 
         if ("leaderboard".equals(actionCommand)) {
+            contentPanel.removeAll();
+            contentPanel.add(new LeaderboardPanel(), LEADERBOARD_CARD);
             cardLayout.show(contentPanel, LEADERBOARD_CARD);
+            contentPanel.revalidate();
+            contentPanel.repaint();
             return;
         }
 
         if ("play".equals(actionCommand)) {
+            try {
+                LogGameResponse response = ClientApp.userService.logGame(new LogGameRequest(ClientSession.username));
+                if (!response.success) {
+                    JOptionPane.showMessageDialog(this, "Failed to record game: " + response.message, "Play Game", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Failed to connect to server. " + e.getMessage(), "Play Game", JOptionPane.ERROR_MESSAGE);
+            }
             return;
         }
 
         if ("logout".equals(actionCommand)) {
             AuthService authService = ClientApp.authService;
             try {
-                LogoutResponse response = authService.logout(new LogoutRequest(ClientSession.instance.username));
+                LogoutResponse response = authService.logout(new LogoutRequest(ClientSession.username));
                 if (!response.success) {
                     // THIS SHOULD NOT HAPPEN
                 }

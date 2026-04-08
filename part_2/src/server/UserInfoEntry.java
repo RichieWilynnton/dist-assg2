@@ -1,6 +1,6 @@
 package server;
 
-class UserInfoEntry {
+public class UserInfoEntry {
     public String username;
     public String password;
     public int numGames;

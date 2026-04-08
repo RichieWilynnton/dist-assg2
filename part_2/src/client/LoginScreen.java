@@ -118,8 +118,7 @@ public class LoginScreen extends JFrame {
                 return;
             }
 
-            ClientSession.init();
-            ClientSession.instance.username = username;
+            ClientSession.username = username;
 
             DashboardFrame dashboardFrame = new DashboardFrame(onLogout);
             dashboardFrame.setVisible(true);

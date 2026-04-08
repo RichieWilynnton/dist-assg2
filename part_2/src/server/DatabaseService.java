@@ -22,7 +22,7 @@ public class DatabaseService {
                         + "&password=" + DB_PASS);
     }
 
-    public void insertUser(String username, String password) throws SQLException {
+    public void insertNewUser(String username, String password) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
                 "INSERT INTO users (username, password) VALUES (?, ?)");
         stmt.setString(1, username);
@@ -48,33 +48,6 @@ public class DatabaseService {
         return null;
     }
 
-    public void updateUserPassword(String username, String newPassword) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE users SET password = ? WHERE username = ?");
-        stmt.setString(1, newPassword);
-        stmt.setString(2, username);
-        stmt.executeUpdate();
-    }
-
-    public void updateUserStats(String username, int numGames, int numWins, float avgTimeToWin, int leaderboard_rank) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE users SET num_games = ?, num_wins = ?, avg_time_to_win = ?, leaderboard_rank = ?" +
-                " WHERE username = ?");
-        stmt.setInt(1, numGames);
-        stmt.setInt(2, numWins);
-        stmt.setFloat(3, avgTimeToWin);
-        stmt.setInt(4, leaderboard_rank);
-        stmt.setString(5, username);
-        stmt.executeUpdate();
-    }
-
-    public void deleteUser(String username) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(
-                "DELETE FROM users WHERE username = ?");
-        stmt.setString(1, username);
-        stmt.executeUpdate();
-    }
-
     public void insertOnlineUser(String username) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
                 "INSERT INTO online_users (username) VALUES (?)");
@@ -82,7 +55,7 @@ public class DatabaseService {
         stmt.execute();
     }
 
-    public boolean readOnlineUser(String username) throws SQLException {
+    public boolean isOnlineUser(String username) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
                 "SELECT username FROM online_users WHERE username = ?");
         stmt.setString(1, username);
@@ -90,18 +63,35 @@ public class DatabaseService {
         return rs.next();
     }
 
-    public void updateOnlineUser(String oldUsername, String newUsername) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE online_users SET username = ? WHERE username = ?");
-        stmt.setString(1, newUsername);
-        stmt.setString(2, oldUsername);
-        stmt.executeUpdate();
-    }
-
     public void deleteOnlineUser(String username) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
                 "DELETE FROM online_users WHERE username = ?");
         stmt.setString(1, username);
         stmt.executeUpdate();
+    }
+
+    public void incrementNumGames(String username) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE users SET num_games = num_games + 1 WHERE username = ?");
+        stmt.setString(1, username);
+        stmt.executeUpdate();
+    }
+
+    public java.util.List<UserInfoEntry> readLeaderboard() throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(
+                "SELECT username, password, num_games, num_wins, avg_time_to_win, leaderboard_rank" +
+                " FROM users ORDER BY leaderboard_rank ASC");
+        ResultSet rs = stmt.executeQuery();
+        java.util.List<UserInfoEntry> entries = new java.util.ArrayList<>();
+        while (rs.next()) {
+            entries.add(new UserInfoEntry(
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getInt("num_games"),
+                    rs.getInt("num_wins"),
+                    rs.getFloat("avg_time_to_win"),
+                    rs.getInt("leaderboard_rank")));
+        }
+        return entries;
     }
 }

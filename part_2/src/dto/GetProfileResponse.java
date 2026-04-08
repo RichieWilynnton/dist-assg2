@@ -1,6 +1,6 @@
 package dto;
 
-public class GetProfileResponse extends AuthResponse {
+public class GetProfileResponse extends BaseResponse {
     public final String username;
     public final int numGames;
     public final int numWins;

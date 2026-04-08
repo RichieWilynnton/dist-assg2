@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     num_games       INT             NOT NULL DEFAULT 0,
     num_wins        INT             NOT NULL DEFAULT 0,
     avg_time_to_win FLOAT           NOT NULL DEFAULT 0.0,
-    rank            INT             NOT NULL DEFAULT 0
+    leaderboard_rank            INT             NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS online_users (
