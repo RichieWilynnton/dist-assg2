@@ -6,6 +6,8 @@ import dto.LogoutRequest;
 import dto.LogoutResponse;
 import dto.RegisterRequest;
 import dto.RegisterResponse;
+import dto.UpdatePasswordRequest;
+import dto.UpdatePasswordResponse;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.SQLException;
@@ -67,6 +69,28 @@ public class AuthServiceImpl extends UnicastRemoteObject implements AuthService 
         } catch (SQLException e) {
             System.err.println("Database error during logout: " + e.getMessage());
             return new LogoutResponse(false, "Internal server error : " + e.getMessage());
+        }
+    }
+
+    @Override
+    public UpdatePasswordResponse updatePassword(UpdatePasswordRequest request) {
+        try {
+            UserInfoEntry userInfo = db.readUser(request.username);
+            if (userInfo == null) {
+                return new UpdatePasswordResponse(false, "User not found");
+            }
+            if (!userInfo.password.equals(request.currentPassword)) {
+                return new UpdatePasswordResponse(false, "Current password is incorrect");
+            }
+            if (request.newPassword == null || request.newPassword.isEmpty()) {
+                return new UpdatePasswordResponse(false, "New password cannot be empty");
+            }
+            db.updatePassword(request.username, request.newPassword);
+            System.out.println("Password updated for user: " + request.username);
+            return new UpdatePasswordResponse(true, "Password updated successfully");
+        } catch (SQLException e) {
+            System.err.println("Database error during password update: " + e.getMessage());
+            return new UpdatePasswordResponse(false, "Internal server error: " + e.getMessage());
         }
     }
 }

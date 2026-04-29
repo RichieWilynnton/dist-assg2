@@ -70,6 +70,14 @@ public class DatabaseService {
         stmt.executeUpdate();
     }
 
+    public void updatePassword(String username, String newPassword) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE users SET password = ? WHERE username = ?");
+        stmt.setString(1, newPassword);
+        stmt.setString(2, username);
+        stmt.executeUpdate();
+    }
+
     public void incrementNumGames(String username) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
                 "UPDATE users SET num_games = num_games + 1 WHERE username = ?");
